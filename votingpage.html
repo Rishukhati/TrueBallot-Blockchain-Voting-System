@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voting area</title>
+    <link rel="stylesheet" href="/frontend/output.css">
+    <link href="https://fonts.googleapis.com/css2?family=Just+Me+Again+Down+Here&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<!-- Web3.js from CDN -->
+<script type="module" src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+
+<!-- Your ABI as a global variable -->
+<script src="./Metamask-conection/VotingABI.js"></script>
+
+</head>
+<body class="h-screen bg-black ">
+
+    <header class="p-1">
+        <nav class="flex flex-wrap items-center justify-between px-4 py-2 border-b border-white text-white">
+      
+          <!-- Logo + Tagline -->
+          <div class="flex items-baseline gap-2">
+            <p class="text-[40px] font-bold" style="font-family: 'Irish Grover', cursive;">TrueBallot</p>
+            <p class="text-[16px]" style="font-family: 'Just Me Again Down Here', cursive;">TrueBallot a universal voting platform</p>
+          </div>
+
+          <!-- Nav Links + Wallet Button -->
+          <div id="menu" class="w-full md:w-auto md:flex items-center gap-6 hidden md:flex-row mt-4 md:mt-0 ">
+            <ul class="flex flex-col md:flex-row md:space-x-6 font-bold mb-4 md:mb-0">
+              <li><a href="home.html" class="hover:text-blue-500">Home</a></li>
+              <li><a href="details-page.html" class="hover:text-blue-500">Features</a></li>
+              <li><a href="details-page.html" class="hover:text-blue-500">About</a></li>
+              <li><a href="details-page.html" class="hover:text-blue-500">Contact</a></li>
+            </ul>
+            <div class="flex items-center gap-2">
+              <button id="connectBtn" class="px-5 py-2 ">
+                Connect Wallet
+              </button>
+              <span id="status" class="text-sm text-gray-300">Not connected</span>
+            </div>
+          </div>
+      
+        </nav>
+      </header>
+       
+    
+    <style>
+        .vote-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .vote-count {
+            transition: all 0.3s ease;
+        }
+    </style>
+
+<!--<body class="bg-gray-100 min-h-screen">-->
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-purple-700 mb-2">Community Choice Awards</h1>
+            <p class="text-xl text-gray-100">Vote for your favorite candidate</p>
+        </header>
+
+    
+
+        <!-- Voting Chart -->
+        <div class="bg-white p-6 rounded-lg shadow mb-8">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Live Voting Results</h2>
+            <canvas id="votes-chart" class="w-full h-64"></canvas>
+        </div>
+
+        <!-- Candidates Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+            <!-- Candidate 1 -->
+            <div class="vote-card bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300">
+                <img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg" 
+                     alt="Alex Johnson" 
+                     class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-1">Alex Johnson</h3>
+                    <p class="text-sm text-gray-600 mb-3">Innovative leader with 10 years of experience</p>
+                    <div class="flex items-center justify-between">
+                        <button id="voteBtn-1" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded-lg transition-colors duration-300 text-sm">
+                            Vote
+                        </button>
+                        
+                        <div class="vote-count flex items-center">
+                            <span class="text-gray-700 text-sm mr-1">Votes:</span>
+                            <span id="count-1" class="font-bold">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Candidate 2 -->
+            <div class="vote-card bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300">
+                <img src="https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg" 
+                     alt="Sarah Williams" 
+                     class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-1">Sarah Williams</h3>
+                    <p class="text-sm text-gray-600 mb-3">Passionate educator focused on youth</p>
+                    <div class="flex items-center justify-between">
+                        <button id="voteBtn-2" class="bg-green-500 hover:bg-green-600 text-white px-4 py-1.5 rounded-lg transition-colors duration-300 text-sm">
+                            Vote
+                        </button>
+                        <div class="vote-count flex items-center">
+                            <span class="text-gray-700 text-sm mr-1">Votes:</span>
+                            <span id="count-2" class="font-bold">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <!-- Candidate 3 -->
+            <div class="vote-card bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300">
+                <img src="https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg" 
+                     alt="Michael Chen" 
+                     class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-1">Michael Chen</h3>
+                    <p class="text-sm text-gray-600 mb-3">Tech entrepreneur creating opportunities</p>
+                    <div class="flex items-center justify-between">
+                        <button id="voteBtn-3" 
+                                class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1.5 rounded-lg transition-colors duration-300 text-sm">
+                            Vote
+                        </button>
+                        <div class="vote-count flex items-center">
+                            <span class="text-gray-700 text-sm mr-1">Votes:</span>
+                            <span id="count-3" class="font-bold">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Candidate 4 -->
+            <div class="vote-card bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300">
+                <img src="https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg" 
+                     alt="Emma Davis" 
+                     class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-1">Emma Davis</h3>
+                    <p class="text-sm text-gray-600 mb-3">Environmental activist and organizer</p>
+                    <div class="flex items-center justify-between">
+                        <button id="voteBtn-4" 
+                                class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-1.5 rounded-lg transition-colors duration-300 text-sm">
+                            Vote
+                        </button>
+                        <div class="vote-count flex items-center">
+                            <span class="text-gray-700 text-sm mr-1">Votes:</span>
+                            <span id="count-4" class="font-bold">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Candidate 5 -->
+            <div class="vote-card bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300">
+                <img src="https://images.pexels.com/photos/3764119/pexels-photo-3764119.jpeg" 
+                     alt="James Wilson" 
+                     class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-1">James Wilson</h3>
+                    <p class="text-sm text-gray-600 mb-3">Healthcare advocate improving access</p>
+                    <div class="flex items-center justify-between">
+                        <button id="voteBtn-5" 
+                                class="bg-pink-500 hover:bg-pink-600 text-white px-4 py-1.5 rounded-lg transition-colors duration-300 text-sm">
+                            Vote
+                        </button>
+                        <div class="vote-count flex items-center">
+                            <span class="text-gray-700 text-sm mr-1">Votes:</span>
+                            <span id="count-5" class="font-bold">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Votes -->
+        <div class="bg-white p-4 rounded-lg shadow text-center">
+            <h3 class="text-xl font-semibold text-gray-800 mb-1">Total Votes</h3>
+            <p id="total-votes" class="text-3xl font-bold text-blue-500">0</p>
+        </div>
+    </div>
+
+    <!-- Countdown Timer -->
+    <div class="bg-blue-900 text-white p-3 text-center">
+        <p id="countdown" class="font-semibold"></p>
+    </div>
+
+    <!-- Voting Confirmation Modal -->
+    <div id="voteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-lg max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">Confirm Your Vote</h3>
+            <p class="mb-4">Each person can only vote once. Are you sure you want to vote for <span id="candidateName"></span>?</p>
+            
+            <div class="mb-4 p-3 bg-gray-100 rounded">
+                <h4 class="font-semibold mb-2">Payment Details</h4>
+                <p class="text-sm">Gas fee: 0.001 ETH</p>
+                <p class="text-sm">Network: Ethereum Mainnet</p>
+            </div>
+            
+            <div class="flex justify-end space-x-3">
+                <button onclick="document.getElementById('voteModal').classList.add('hidden')" 
+                        class="px-4 py-2 border rounded-lg">
+                    Cancel
+                </button>
+                <button id="confirmVoteBtn" 
+                        class="px-4 py-2 bg-blue-500 text-white rounded-lg">
+                    Confirm & Pay
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="voting-script.js"></script>
+
+<!-- Connect wallet -->
+<script type="module" src="./Metamask-conection/connectWallet.js"></script>
+
+</body>
+</html>
+
+
